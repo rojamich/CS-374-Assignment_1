@@ -28,17 +28,29 @@ struct Movie *createMovie(char *currLine)
     strcpy(currMovie->title, token);
 
     // The next token is the year
-    token = strtok_r(NULL, " ", &saveptr);
+    token = strtok_r(NULL, ",", &saveptr);
     currMovie->year = atoi(token);
 
     // The next token is the languages
-    token = strtok_r(NULL, " ", &saveptr);
+    token = strtok_r(NULL, ",", &saveptr);
+    // Extract the number of languages from within square brackets
+    char *start = strchr(token, '[');
+    char *end = strchr(token, ']');
+    if (start && end) {
+        // Count the number of semicolons to determine the number of languages
+        currMovie->num_languages = 1;
+        for (char *c = start; c < end; c++) {
+            if (*c == ';') {
+                currMovie->num_languages++;
+            }
+        }
+    } else {
+        // If there are no square brackets, assume there is only one language
+        currMovie->num_languages = 1;
+    }
+    // Allocate memory for languages string and copy the token
     currMovie->languages = calloc(strlen(token) + 1, sizeof(char));
     strcpy(currMovie->languages, token);
-
-    // The last token is the number of languages
-    token = strtok_r(NULL, "\n", &saveptr);
-    currMovie->num_languages = atoi(token);
 
     // The last token is the rating
     token = strtok_r(NULL, "\n", &saveptr);
@@ -46,6 +58,8 @@ struct Movie *createMovie(char *currLine)
 
     // Set the next node to NULL in the newly created student entry
     currMovie->next = NULL;
+
+    free(currLine);
 
     return currMovie;
 }
