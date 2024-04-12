@@ -23,7 +23,7 @@ struct Movie *createMovie(char *currLine)
     char *saveptr;
 
     // The first token is the title
-    char *token = strtok_r(currLine, " ", &saveptr);
+    char *token = strtok_r(currLine, ",", &saveptr);
     currMovie->title = calloc(strlen(token) + 1, sizeof(char));
     strcpy(currMovie->title, token);
 
@@ -34,20 +34,14 @@ struct Movie *createMovie(char *currLine)
     // The next token is the languages
     token = strtok_r(NULL, ",", &saveptr);
     // Extract the number of languages from within square brackets
-    char *start = strchr(token, '[');
-    char *end = strchr(token, ']');
-    if (start && end) {
-        // Count the number of semicolons to determine the number of languages
+    // Count the number of semicolons to determine the number of languages
         currMovie->num_languages = 1;
-        for (char *c = start; c < end; c++) {
+        for (char *c = token; *c; c++) {
             if (*c == ';') {
                 currMovie->num_languages++;
             }
         }
-    } else {
-        // If there are no square brackets, assume there is only one language
-        currMovie->num_languages = 1;
-    }
+
     // Allocate memory for languages string and copy the token
     currMovie->languages = calloc(strlen(token) + 1, sizeof(char));
     strcpy(currMovie->languages, token);
